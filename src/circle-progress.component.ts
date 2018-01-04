@@ -31,12 +31,17 @@ export interface CircleProgressOptionsInterface {
   subtitle?: string;
   subtitleColor?: string;
   subtitleFontSize?: string;
+  subtitleFormat2?: Function;
+  subtitle2?: string;
+  subtitleColor2?: string;
+  subtitleFontSize2?: string;
   animation?: boolean;
   animateTitle?: boolean;
   animateSubtitle?: boolean;
   animationDuration?: number;
   showTitle?: boolean;
   showSubtitle?: boolean;
+  showSubtitle2?: boolean;
   showUnits?: boolean;
   showBackground?: boolean;
   showInnerStroke?: boolean;
@@ -72,12 +77,17 @@ export class CircleProgressOptions implements CircleProgressOptionsInterface {
   subtitle = 'progress';
   subtitleColor = '#A9A9A9';
   subtitleFontSize = '10';
+  subtitleFormat2 = undefined;
+  subtitle2 = 'progress2';
+  subtitleColor2 = '#A9A9A9';
+  subtitleFontSize2 = '10';
   animation = true;
   animateTitle = true;
   animateSubtitle = false;
   animationDuration = 500;
   showTitle = true;
   showSubtitle = true;
+  showSubtitle2 = true;
   showUnits = true;
   showBackground = true;
   showInnerStroke = true;
@@ -128,6 +138,13 @@ export class CircleProgressOptions implements CircleProgressOptionsInterface {
         [attr.y]="svg.subtitle.y">
         <tspan [attr.font-size]="svg.subtitle.fontSize">{{svg.subtitle.text}}</tspan>
       </text>
+      <text *ngIf="options.showSubtitle2"
+        [attr.text-anchor]="svg.subtitle.textAnchor" 
+        [attr.fill]="svg.subtitle2.color" 
+        [attr.x]="svg.subtitle2.x"
+        [attr.y]="svg.subtitle2.y">
+        <tspan [attr.font-size]="svg.subtitle2.fontSize">{{svg.subtitle2.text}}</tspan>
+      </text>
     </svg>  
   `
 })
@@ -170,6 +187,11 @@ export class CircleProgressComponent implements OnChanges {
   @Input() subtitleColor: string;
   @Input() subtitleFontSize: string;
 
+  @Input() subtitleFormat2: Function;
+  @Input() subtitle2: string;
+  @Input() subtitleColor2: string;
+  @Input() subtitleFontSize2: string;
+
   @Input() animation: boolean;
   @Input() animateTitle: boolean;
   @Input() animateSubtitle: boolean;
@@ -177,6 +199,7 @@ export class CircleProgressComponent implements OnChanges {
 
   @Input() showTitle: boolean;
   @Input() showSubtitle: boolean;
+  @Input() showSubtitle2: boolean;
   @Input() showUnits: boolean;
   @Input() showBackground: boolean;
   @Input() showInnerStroke: boolean;
@@ -273,6 +296,7 @@ export class CircleProgressComponent implements OnChanges {
     let titleTextPercent = titlePercent > this.options.maxPercent ?
       `${this.options.maxPercent.toFixed(this.options.toFixed)}+` : titlePercent.toFixed(this.options.toFixed);
     let subtitlePercent = this.options.animateSubtitle ? percent : this.options.percent;
+    let subtitlePercent2 = this.options.animateSubtitle ? percent : this.options.percent;
     // assemble all
     this.svg = {
       width: boxSize,
@@ -305,7 +329,7 @@ export class CircleProgressComponent implements OnChanges {
       },
       title: {
         x: centre.x,
-        y: centre.y,
+        y: centre.y - 15,
         textAnchor: 'middle',
         text:
         (this.options.titleFormat !== undefined && this.options.titleFormat.constructor.name === 'Function')
@@ -320,13 +344,23 @@ export class CircleProgressComponent implements OnChanges {
       },
       subtitle: {
         x: centre.x,
-        y: centre.y + 15,
+        y: centre.y,
         textAnchor: 'middle',
         text:
         (this.options.subtitleFormat !== undefined && this.options.subtitleFormat.constructor.name === 'Function')
           ? this.options.subtitleFormat(subtitlePercent) : this.options.subtitle,
         color: this.options.subtitleColor,
         fontSize: this.options.subtitleFontSize
+      },
+      subtitle2: {
+        x: centre.x,
+        y: centre.y + 15,
+        textAnchor: 'middle',
+        text:
+        (this.options.subtitleFormat2 !== undefined && this.options.subtitleFormat2.constructor.name === 'Function')
+          ? this.options.subtitleFormat2(subtitlePercent2) : this.options.subtitle2,
+        color: this.options.subtitleColor2,
+        fontSize: this.options.subtitleFontSize2
       },
     };
   }
